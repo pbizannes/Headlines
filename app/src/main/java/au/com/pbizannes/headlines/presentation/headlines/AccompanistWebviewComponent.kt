@@ -35,7 +35,6 @@ fun AccompanistWebviewComponent(
 ) {
     val webViewState = rememberWebViewState(url = urlToLoad)
     val webViewNavigator = rememberWebViewNavigator()
-    var webView: WebView? = null // To control the WebView instance
 
     // Handle back press to navigate within WebView if possible, otherwise navigate up
     BackHandler(enabled = webViewNavigator.canGoBack) {
@@ -99,9 +98,11 @@ fun AccompanistWebviewComponent(
                 modifier = Modifier.weight(1f), // WebView takes remaining space
                 navigator = webViewNavigator,
                 onCreated = { createdWebView ->
-                    webView = createdWebView
                     // Configure WebView settings if needed
                     createdWebView.settings.javaScriptEnabled = true
+                    createdWebView.settings.allowFileAccess = true
+                    createdWebView.settings.setDomStorageEnabled(true);
+
                     // Add other settings like zoom controls, etc.
                     // webView.settings.builtInZoomControls = true
                     // webView.settings.displayZoomControls = false
