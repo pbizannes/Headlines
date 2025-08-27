@@ -32,10 +32,6 @@ class HeadlinesViewModel @Inject constructor(
 
     private val collectedArticles = MutableStateFlow<List<Article>>(emptyList())
 
-    init {
-        loadContent()
-    }
-
     // Function to check if an article is bookmarked/saved
     // This will be called by each ArticleItem to determine initial checkbox state
     fun isArticleBookmarked(articleUrl: String): Flow<Boolean> {

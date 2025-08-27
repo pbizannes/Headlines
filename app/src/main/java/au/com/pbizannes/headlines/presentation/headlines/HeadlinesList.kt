@@ -12,7 +12,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.pbizannes.headlines.domain.model.Article
 import au.com.pbizannes.headlines.domain.model.ArticleSource
 import au.com.pbizannes.headlines.presentation.components.ArticleComponent
-import au.com.pbizannes.headlines.presentation.mapper.ArticleMapper
+import au.com.pbizannes.headlines.ui.theme.HeadlinesTheme
 
 @Composable
 fun HeadlinesList(
@@ -89,31 +89,27 @@ fun HeadlinesListPreview() {
         )
     )
 
-    // You might want to wrap your preview in your app's theme
-    // import au.com.pbizannes.headlines.ui.theme.HeadlinesTheme
-    // HeadlinesTheme {
-    HeadlinesList(
-        articles = sampleArticles,
-        onArticleClick = { article ->
-            // In a preview, you can log or do nothing on click
-            println("Preview: Clicked on article - ${article.title}")
-        }
-    )
-    // }
+    HeadlinesTheme {
+        HeadlinesList(
+            articles = sampleArticles,
+            onArticleClick = { article ->
+                // In a preview, you can log or do nothing on click
+                println("Preview: Clicked on article - ${article.title}")
+            }
+        )
+    }
 }
 
 @Preview(showBackground = true, name = "Empty Headlines List Preview")
 @Composable
 fun EmptyHeadlinesListPreview() {
-    // You might want to wrap your preview in your app's theme
-    // import au.com.pbizannes.headlines.ui.theme.HeadlinesTheme
-    // HeadlinesTheme {
-    HeadlinesList(
-        articles = emptyList(), // Pass an empty list
-        onArticleClick = { article ->
-            println("Preview: Clicked on article - ${article.title}")
-        }
-    )
-    // }
+    HeadlinesTheme {
+        HeadlinesList(
+            articles = emptyList(), // Pass an empty list
+            onArticleClick = { article ->
+                println("Preview: Clicked on article - ${article.title}")
+            }
+        )
+    }
 }
 

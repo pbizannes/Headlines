@@ -21,6 +21,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import au.com.pbizannes.headlines.ui.theme.HeadlinesTheme
 import com.google.accompanist.web.AccompanistWebViewClient
 import com.google.accompanist.web.LoadingState
 import com.google.accompanist.web.WebView
@@ -127,5 +129,16 @@ fun AccompanistWebviewComponent(
                 }
             )
         }
+    }
+}
+
+@Preview(name = "Actual Component Structure", showBackground = true)
+@Composable
+fun ActualAccompanistWebviewComponentPreview() {
+    HeadlinesTheme {
+        AccompanistWebviewComponent(
+            urlToLoad = "https.preview.example.com",
+            onNavigateUp = { /* Preview: No action */ }
+        )
     }
 }
