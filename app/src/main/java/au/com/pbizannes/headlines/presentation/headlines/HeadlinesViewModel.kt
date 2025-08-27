@@ -1,15 +1,12 @@
 package au.com.pbizannes.headlines.presentation.headlines
 
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.pbizannes.headlines.data.preferences.UserPreferencesRepository
 import au.com.pbizannes.headlines.domain.model.Article
 import au.com.pbizannes.headlines.domain.model.ArticleSource
 import au.com.pbizannes.headlines.domain.repository.ArticleRepository
 import au.com.pbizannes.headlines.domain.repository.NewsRepository
+import au.com.pbizannes.headlines.domain.repository.UserPreferencesRepository
 import au.com.pbizannes.headlines.presentation.HeadlinesUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -64,46 +61,36 @@ class HeadlinesViewModel @Inject constructor(
             _headlinesUIState.value = HeadlinesUIState.Loading
             collectedArticles.value = emptyList() // Reset articles
 
-            // 1. Get selected source IDs from DataStore
-            userPreferencesRepository.selectedSourceIdsFlow.firstOrNull().let { selectedIds ->
-                // 4. Fetch headlines for the filtered sources
-                // This part assumes getHeadlines emits articles one by one or in chunks
-                // and we need to collect them.
-                try {
+            try {
+                userPreferencesRepository.selectedSourceIdsFlow().firstOrNull().let { selectedIds ->
                     val articleSources = selectedIds?.map { id ->
                         ArticleSource(
                             id = id,
                             name = id
-                        ) } ?: listOf()
-                    val selectedNewsSources =
-                        newsRepository.getHeadlines(articleSources)
-                            .catch { e -> // Catch errors from the getHeadlines Flow itself
-                                _headlinesUIState.value =
-                                    HeadlinesUIState.Error("Error fetching headlines: ${e.message ?: "Unknown error"}")
-                            }
-                            .collect { article ->
-                                // Add to our collected list and update UI
-                                // This is a common pattern if articles stream in.
-                                // If getHeadlines() was meant to emit a single List<Article>,
-                                // the .collect logic would be simpler.
-                                val currentArticles = collectedArticles.value.toMutableList()
-                                currentArticles.add(article)
-                                collectedArticles.value = currentArticles
-                                // Update UI state with the incrementally built list
-                                // Debounce or update less frequently if articles come very fast
-                                _headlinesUIState.value = HeadlinesUIState.Success(collectedArticles.value)
-                            }
+                        )
+                    } ?: listOf()
 
-                    // If, after collecting all articles, the list is still empty,
-                    // but sources were available, it implies no articles for those sources.
+                    newsRepository.getHeadlines(articleSources)
+                        .catch { e ->
+                            _headlinesUIState.value =
+                                HeadlinesUIState.Error("Error fetching headlines: ${e.message ?: "Unknown error"}")
+                        }
+                        .collect { article ->
+                            val currentArticles = collectedArticles.value.toMutableList()
+                            currentArticles.add(article)
+                            collectedArticles.value = currentArticles
+                            _headlinesUIState.value =
+                                HeadlinesUIState.Success(collectedArticles.value)
+                        }
+
                     if (collectedArticles.value.isEmpty() && _headlinesUIState.value !is HeadlinesUIState.Error) {
                         _headlinesUIState.value = HeadlinesUIState.Success(emptyList())
                     }
 
-                } catch (e: Exception) { // Catch any other exceptions during the process
-                    _headlinesUIState.value =
-                        HeadlinesUIState.Error("Failed to load headlines: ${e.message ?: "Unknown error"}")
                 }
+            } catch (e: Exception) { // Catch any other exceptions during the process
+                _headlinesUIState.value =
+                    HeadlinesUIState.Error("Failed to load headlines: ${e.message ?: "Unknown error"}")
             }
         }
     }

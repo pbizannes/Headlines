@@ -20,6 +20,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        //testInstrumentationRunner = "au.com.pbizannes.headlines.HiltTestRunner"
     }
 
     buildTypes {
@@ -96,6 +97,21 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.turbine)
     testImplementation(libs.junit)
+
+    androidTestImplementation(libs.androidx.runner) // Or latest
+    androidTestImplementation(libs.androidx.rules)   // Or latest
+
+    // Espresso
+    androidTestImplementation(libs.androidx.espresso.contrib) // For RecyclerView, DatePicker, etc.
+    androidTestImplementation(libs.androidx.espresso.intents) // For testing Intents
+
+    // Assertions
+    androidTestImplementation(libs.androidx.truth)  // Or latest (optional, for more fluent assertions)
+    androidTestImplementation(libs.truth)   // Or latest (optional)
+
+    // Hilt testing (if you use Hilt for dependency injection)
+    androidTestImplementation(libs.hilt.android.testing) // Or latest
+    kspAndroidTest(libs.hilt.android.compiler.v248) // Or latest
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

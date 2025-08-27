@@ -4,8 +4,6 @@ import au.com.pbizannes.headlines.data.source.local.ArticleDao
 import au.com.pbizannes.headlines.domain.model.Article
 import au.com.pbizannes.headlines.domain.repository.ArticleRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
 class DefaultArticleRepository @Inject constructor(

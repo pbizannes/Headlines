@@ -11,7 +11,7 @@ import au.com.pbizannes.headlines.domain.model.Article
     version = 1,                 // Increment version on schema changes
     exportSchema = false         // Set to true if you want to export schema for migrations
 )
-public abstract class HeadlinesDatabase : RoomDatabase() {
+abstract class HeadlinesDatabase : RoomDatabase() {
 
     abstract fun articleDao(): ArticleDao
 

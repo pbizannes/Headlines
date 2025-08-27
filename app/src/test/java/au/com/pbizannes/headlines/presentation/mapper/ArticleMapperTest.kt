@@ -2,17 +2,27 @@ package au.com.pbizannes.headlines.presentation.mapper
 
 import au.com.pbizannes.headlines.domain.model.Article
 import au.com.pbizannes.headlines.domain.model.ArticleSource
+import au.com.pbizannes.headlines.util.Tools
+import io.mockk.every
+import io.mockk.mockkObject
+import io.mockk.unmockkAll
+import org.junit.After
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Test
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 class ArticleMapperTest {
+    @Before
+    fun setup() {
+        mockkObject(Tools)
+        every { Tools.now() } returns Instant.parse("2025-08-27T00:55:20Z")
+    }
 
     @Test
     fun `toPresentation maps domain Article to ArticleUi correctly`() {
         val domainSource = ArticleSource(id = "test-source", name = "Test Source Name")
-        val now = Instant.now()
         val domainArticle = Article(
             url = "http://example.com/article1",
             source = domainSource,
@@ -20,7 +30,7 @@ class ArticleMapperTest {
             title = "Test Title",
             description = "Test Description",
             urlToImage = "http://example.com/image.jpg",
-            publishedAt = "2025-08-27T00:55:20Z",
+            publishedAt = "2025-08-26T18:55:20Z",
             content = "Test Content"
         )
 
@@ -33,14 +43,13 @@ class ArticleMapperTest {
         Assert.assertEquals("Test Description", articleUi.description)
         Assert.assertEquals("http://example.com/image.jpg", articleUi.urlToImage)
         Assert.assertEquals("Test Content", articleUi.content)
-        // More specific date testing would require mocking Instant.now() or careful setup
         Assert.assertEquals("6h ago", articleUi.publishedAtFormatted) // Assuming API >= 26
     }
 
     @Test
     fun `toPresentation formats date a few hours ago`() {
         val domainSource = ArticleSource(id = "test-source", name = "Test Source Name")
-        val fewHoursAgo = Instant.now().minus(3, ChronoUnit.HOURS).toString()
+        val fewHoursAgo = Tools.now().minus(3, ChronoUnit.HOURS).toString()
         val domainArticle = Article(
             url = "http://example.com/article2",
             source = domainSource,
@@ -61,7 +70,7 @@ class ArticleMapperTest {
     @Test
     fun `toPresentation formats date many days ago`() {
         val domainSource = ArticleSource(id = "test-source", name = "Test Source Name")
-        val manyDaysAgo = Instant.now().minus(10, ChronoUnit.DAYS).toString()
+        val manyDaysAgo = Tools.now().minus(10, ChronoUnit.DAYS).toString()
         val domainArticle = Article(
             url = "http://example.com/article3",
             source = domainSource,
@@ -75,9 +84,6 @@ class ArticleMapperTest {
 
         val articleUi = ArticleMapper.toPresentation(domainArticle)
 
-        // This will be a formatted date like "Oct 17, 2023" (depending on current date)
-        // For a stable test, you might mock the date or check for a pattern.
-        // For simplicity, we check it's not a relative time string.
         assert(!articleUi.publishedAtFormatted.endsWith("ago"))
     }
 
@@ -87,11 +93,11 @@ class ArticleMapperTest {
         val domainArticles = listOf(
             Article(
                 url = "url1", source = domainSource, author = "A1", title = "T1",
-                description = "D1", urlToImage = "I1", publishedAt = Instant.now().toString(), content = "C1"
+                description = "D1", urlToImage = "I1", publishedAt = Tools.now().toString(), content = "C1"
             ),
             Article(
                 url = "url2", source = domainSource, author = "A2", title = "T2",
-                description = "D2", urlToImage = "I2", publishedAt = Instant.now().minus(1, ChronoUnit.DAYS).toString(), content = "C2"
+                description = "D2", urlToImage = "I2", publishedAt = Tools.now().minus(1, ChronoUnit.DAYS).toString(), content = "C2"
             )
         )
 
@@ -105,5 +111,10 @@ class ArticleMapperTest {
         Assert.assertEquals("url2", articleUiList[1].url)
         Assert.assertEquals("T2", articleUiList[1].title)
         Assert.assertEquals("1d ago", articleUiList[1].publishedAtFormatted)
+    }
+
+    @After
+    fun tearDown() {
+        unmockkAll()
     }
 }

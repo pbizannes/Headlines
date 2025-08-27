@@ -21,6 +21,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import au.com.pbizannes.headlines.ui.theme.HeadlinesTheme
 import com.google.accompanist.web.AccompanistWebViewClient
@@ -97,7 +98,7 @@ fun AccompanistWebviewComponent(
 
             WebView(
                 state = webViewState,
-                modifier = Modifier.weight(1f), // WebView takes remaining space
+                modifier = Modifier.weight(1f).testTag("webview"),
                 navigator = webViewNavigator,
                 onCreated = { createdWebView ->
                     // Configure WebView settings if needed
@@ -105,7 +106,7 @@ fun AccompanistWebviewComponent(
                     createdWebView.settings.allowFileAccess = true
 
                     // some websites require dom storage
-                    createdWebView.settings.domStorageEnabled = true;
+                    createdWebView.settings.domStorageEnabled = true
 
                     // allow zoom in and out for websites
                     createdWebView.settings.builtInZoomControls = true

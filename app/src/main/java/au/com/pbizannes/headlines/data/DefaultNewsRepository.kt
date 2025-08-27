@@ -18,7 +18,6 @@ class DefaultNewsRepository(val newsService: NewsService) : NewsRepository {
             val responseBody = response.body()
             if (response.isSuccessful) {
                 if (responseBody != null) {
-                    responseBody.sources.asFlow()
                     Result.success(responseBody.sources)
                 } else {
                     Result.failure(NoSuchElementException())
@@ -35,7 +34,7 @@ class DefaultNewsRepository(val newsService: NewsService) : NewsRepository {
         return try {
             val country = if (sources.isEmpty()) "us" else null
             val response = newsService.getHeadlines(
-                apiKey = apiKey.toString(),
+                apiKey = apiKey,
                 country = country,
                 sourceList = sources.map { it.id }.requireNoNulls()
             )

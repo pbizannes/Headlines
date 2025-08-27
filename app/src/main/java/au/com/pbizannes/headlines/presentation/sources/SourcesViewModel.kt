@@ -2,9 +2,9 @@ package au.com.pbizannes.headlines.presentation.sources
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.pbizannes.headlines.data.preferences.UserPreferencesRepository
 import au.com.pbizannes.headlines.domain.model.NewsSource
 import au.com.pbizannes.headlines.domain.repository.NewsRepository
+import au.com.pbizannes.headlines.domain.repository.UserPreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -41,7 +41,7 @@ class SourcesViewModel @Inject constructor(
             // the repository itself returns a Flow<Result<List<NewsSource>>>)
             // For simplicity, let's assume getSources() is suspend and we convert its result to a flow here.
             flow { emit(newsRepository.getSources()) }, // newsRepository.getSources() returns Result<List<NewsSource>>
-            userPreferencesRepository.selectedSourceIdsFlow
+            userPreferencesRepository.selectedSourceIdsFlow()
         ) { sourcesResult, selectedIds ->
             sourcesResult.fold(
                 onSuccess = { allSources ->

@@ -13,17 +13,11 @@ interface ArticleDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE) // Replace if article with same URL already exists
     suspend fun insertArticle(article: Article)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAllArticles(articles: List<Article>)
-
     @Query("SELECT * FROM articles ORDER BY publishedAt DESC") // Get all articles, newest first
     fun getAllArticles(): Flow<List<Article>> // Use Flow for reactive updates
 
     @Query("SELECT * FROM articles WHERE url = :articleUrl")
     suspend fun getArticleByUrl(articleUrl: String): Article?
-
-    @Query("SELECT * FROM articles WHERE title LIKE :query OR description LIKE :query ORDER BY publishedAt DESC")
-    fun searchArticles(query: String): Flow<List<Article>>
 
     @Delete
     suspend fun deleteArticle(article: Article)

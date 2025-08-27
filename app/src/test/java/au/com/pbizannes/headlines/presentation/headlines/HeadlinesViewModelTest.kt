@@ -2,11 +2,11 @@ package au.com.pbizannes.headlines.presentation.headlines
 
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
-import au.com.pbizannes.headlines.data.preferences.UserPreferencesRepository
 import au.com.pbizannes.headlines.domain.model.Article
 import au.com.pbizannes.headlines.domain.model.ArticleSource
 import au.com.pbizannes.headlines.domain.repository.ArticleRepository
 import au.com.pbizannes.headlines.domain.repository.NewsRepository
+import au.com.pbizannes.headlines.domain.repository.UserPreferencesRepository
 import au.com.pbizannes.headlines.presentation.HeadlinesUIState
 import io.mockk.coEvery
 import io.mockk.coJustRun
@@ -15,7 +15,6 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -46,18 +45,13 @@ class HeadlinesViewModelTest {
         mockArticleRepository = mockk()
         mockUserPrefsRepository = mockk()
 
-        // --- Default Mock Behaviors ---
-        every { mockUserPrefsRepository.selectedSourceIdsFlow } returns flowOf(emptySet()) // Default: no specific sources selected
-        // Default: getHeadlines returns no articles for any source list
+        every { mockUserPrefsRepository.selectedSourceIdsFlow() } returns emptyFlow() // Default: no specific sources selected
         coEvery { mockNewsRepository.getHeadlines(any()) } returns emptyFlow()
 
         every { mockArticleRepository.isArticleSaved(any()) } returns flowOf(false)
         coEvery { mockArticleRepository.getArticleByUrl(any()) } returns null
         coJustRun { mockArticleRepository.saveArticle(any()) }
         coJustRun { mockArticleRepository.deleteArticle(any()) }
-
-        // ViewModel initialization happens after mocks are set up for default behavior
-        // The loadContent() will be called during initialization.
     }
 
     private fun initializeViewModel() {
@@ -66,13 +60,13 @@ class HeadlinesViewModelTest {
 
     @Test
     fun `loadContent with no selected preferences fetches headlines with empty sources list`() = runTest {
-        // Arrange: selectedSourceIdsFlow emits emptySet (default setup)
-        // newsRepository.getHeadlines should be called with an empty list of ArticleSource
-        coEvery { mockNewsRepository.getHeadlines(emptyList()) } returns flowOf(domainArticle1) // Simulate one article for empty sources list (if API supports this, or adjust assertion)
+        coEvery { mockNewsRepository.getHeadlines(emptyList()) } returns flowOf(domainArticle1, domainArticle2) // Simulate one article for empty sources list (if API supports this, or adjust assertion)
         initializeViewModel()
 
         viewModel.headlinesUIState.test {
             assertEquals("Initial state should be Loading", HeadlinesUIState.Loading, awaitItem())
+
+            viewModel.loadContent()
 
             val successState = awaitItem()
             assertTrue("State should be Success", successState is HeadlinesUIState.Success)
@@ -83,32 +77,28 @@ class HeadlinesViewModelTest {
 
             cancelAndConsumeRemainingEvents()
         }
-        coVerify { mockUserPrefsRepository.selectedSourceIdsFlow.firstOrNull() }
         coVerify { mockNewsRepository.getHeadlines(emptyList()) }
     }
 
     @Test
     fun `loadContent with selected preferences fetches headlines for those sources`() = runTest {
-        // Arrange
         val selectedIds = setOf("src-id-1", "src-id-2")
-        every { mockUserPrefsRepository.selectedSourceIdsFlow } returns flowOf(selectedIds)
+        every { mockUserPrefsRepository.selectedSourceIdsFlow() } returns flowOf(selectedIds)
 
         val expectedSourcesToFetch = listOf(
             ArticleSource(id = "src-id-1", name = "src-id-1"),
             ArticleSource(id = "src-id-2", name = "src-id-2")
         )
-        // Simulate getHeadlines returning a flow that emits articles one by one
         coEvery { mockNewsRepository.getHeadlines(expectedSourcesToFetch) } returns flow {
             emit(domainArticle1)
             emit(domainArticle2)
         }
         initializeViewModel()
-        viewModel.loadContent()
 
         viewModel.headlinesUIState.test {
             assertEquals(HeadlinesUIState.Loading, awaitItem())
 
-            // Since articles are collected one by one, UIState will update for each
+            viewModel.loadContent()
             val successState1 = awaitItem() // After first article
             assertTrue(successState1 is HeadlinesUIState.Success)
             assertEquals(1, (successState1 as HeadlinesUIState.Success).articles.size)
@@ -122,21 +112,21 @@ class HeadlinesViewModelTest {
 
             cancelAndConsumeRemainingEvents()
         }
-        coVerify { mockUserPrefsRepository.selectedSourceIdsFlow.firstOrNull() }
         coVerify { mockNewsRepository.getHeadlines(expectedSourcesToFetch) }
     }
 
     @Test
     fun `loadContent when getHeadlines flow is empty results in Success with empty list`() = runTest {
-        // Arrange
         val selectedIds = setOf("src-id-1")
-        every { mockUserPrefsRepository.selectedSourceIdsFlow } returns flowOf(selectedIds)
+        every { mockUserPrefsRepository.selectedSourceIdsFlow() } returns flowOf(selectedIds)
         val expectedSourcesToFetch = listOf(ArticleSource(id = "src-id-1", name = "src-id-1"))
         coEvery { mockNewsRepository.getHeadlines(expectedSourcesToFetch) } returns emptyFlow() // No articles
         initializeViewModel()
 
         viewModel.headlinesUIState.test {
             assertEquals(HeadlinesUIState.Loading, awaitItem())
+
+            viewModel.loadContent()
 
             val successState = awaitItem()
             assertTrue(successState is HeadlinesUIState.Success)
@@ -148,9 +138,8 @@ class HeadlinesViewModelTest {
 
     @Test
     fun `loadContent when getHeadlines flow throws error emits Error state`() = runTest {
-        // Arrange
         val selectedIds = setOf("src-id-1")
-        every { mockUserPrefsRepository.selectedSourceIdsFlow } returns flowOf(selectedIds)
+        every { mockUserPrefsRepository.selectedSourceIdsFlow() } returns flowOf(selectedIds)
         val expectedSourcesToFetch = listOf(ArticleSource(id = "src-id-1", name = "src-id-1"))
         val errorMessage = "Network Failure"
         coEvery { mockNewsRepository.getHeadlines(expectedSourcesToFetch) } returns flow { throw Exception(errorMessage) }
@@ -159,6 +148,7 @@ class HeadlinesViewModelTest {
         viewModel.headlinesUIState.test {
             assertEquals(HeadlinesUIState.Loading, awaitItem())
 
+            viewModel.loadContent()
             val errorState = awaitItem()
             assertTrue(errorState is HeadlinesUIState.Error)
             assertEquals("Error fetching headlines: $errorMessage", (errorState as HeadlinesUIState.Error).message)
@@ -169,24 +159,15 @@ class HeadlinesViewModelTest {
 
     @Test
     fun `loadContent when general exception occurs during processing emits Error state`() = runTest {
-        // Arrange: Make userPreferences throw an unexpected error
         val errorMessage = "Datastore unavailable"
-        every { mockUserPrefsRepository.selectedSourceIdsFlow } returns flow { throw RuntimeException(errorMessage) }
+        every { mockUserPrefsRepository.selectedSourceIdsFlow() } returns flow { throw RuntimeException(errorMessage) }
         initializeViewModel()
 
-
         viewModel.headlinesUIState.test {
-            // Initial state is Loading due to `_headlinesUIState` constructor
-            // The `loadContent` is launched in `init`, and `viewModelScope.launch` might start after this test begins collecting.
-            // Depending on dispatcher timing, we might see the initial Loading or the Loading set at the start of loadContent.
-            // Let's ensure we see the Loading set by loadContent
             val firstState = awaitItem()
-            // It could be the initial Loading or the one set by loadContent if loadContent starts very fast.
-            // Let's be flexible or skip this exact initial state check if timing is tricky with immediate launch.
-            // For robustness, usually, the Loading at the start of the tested function is the one we care about.
 
-            // The exception in `userPreferencesRepository.selectedSourceIdsFlow.firstOrNull()` will be caught
-            // by the outer try-catch in `loadContent`.
+            viewModel.loadContent()
+
             val errorState = skipItemsUpToTheFirstInterestingOne() // Skip initial loading(s) if any
 
             assertTrue("Expected Error state, but got $errorState",errorState is HeadlinesUIState.Error)
@@ -196,7 +177,6 @@ class HeadlinesViewModelTest {
         }
     }
 
-    // Helper for skipping initial/intermediate states when focusing on a later one
     private suspend fun <T> ReceiveTurbine<T>.skipItemsUpToTheFirstInterestingOne(): T {
         var item = awaitItem()
         while (item is HeadlinesUIState.Loading) { // Example condition, adjust if needed
@@ -209,10 +189,8 @@ class HeadlinesViewModelTest {
     @Test
     fun `onBookmarkCheckedChange saves article when isBookmarked is true`() = runTest {
         initializeViewModel() // Ensure ViewModel is initialized
-        // Act
         viewModel.onBookmarkCheckedChange(domainArticle1, true)
 
-        // Assert
         coVerify { mockArticleRepository.saveArticle(domainArticle1) }
         coVerify(exactly = 0) { mockArticleRepository.deleteArticle(any()) }
     }
@@ -220,13 +198,10 @@ class HeadlinesViewModelTest {
     @Test
     fun `onBookmarkCheckedChange deletes article when isBookmarked is false and article exists in repo`() = runTest {
         initializeViewModel()
-        // Arrange
         coEvery { mockArticleRepository.getArticleByUrl(domainArticle1.url) } returns domainArticle1
 
-        // Act
         viewModel.onBookmarkCheckedChange(domainArticle1, false)
 
-        // Assert
         coVerify { mockArticleRepository.deleteArticle(domainArticle1) }
         coVerify(exactly = 0) { mockArticleRepository.saveArticle(any()) }
     }
@@ -234,13 +209,10 @@ class HeadlinesViewModelTest {
     @Test
     fun `onBookmarkCheckedChange does not delete if article not found for deletion`() = runTest {
         initializeViewModel()
-        // Arrange
         coEvery { mockArticleRepository.getArticleByUrl(domainArticle1.url) } returns null // Article not found
 
-        // Act
         viewModel.onBookmarkCheckedChange(domainArticle1, false)
 
-        // Assert
         coVerify(exactly = 0) { mockArticleRepository.deleteArticle(any()) }
     }
 
@@ -248,14 +220,13 @@ class HeadlinesViewModelTest {
     fun `isArticleBookmarked returns correct flow from repository`() = runTest {
         initializeViewModel()
         val testUrl = "url_test"
-        // Test case 1: Bookmarked
+
         every { mockArticleRepository.isArticleSaved(testUrl) } returns flowOf(true)
         viewModel.isArticleBookmarked(testUrl).test {
             assertTrue("Article should be bookmarked", awaitItem())
             awaitComplete()
         }
 
-        // Test case 2: Not bookmarked
         every { mockArticleRepository.isArticleSaved(testUrl) } returns flowOf(false)
         viewModel.isArticleBookmarked(testUrl).test {
             assertEquals("Article should not be bookmarked", false, awaitItem())

@@ -2,21 +2,22 @@ package au.com.pbizannes.headlines.presentation.mapper
 
 import au.com.pbizannes.headlines.domain.model.Article
 import au.com.pbizannes.headlines.presentation.components.ArticleUI
+import au.com.pbizannes.headlines.util.Tools
 import java.time.Duration
-import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
-import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 object ArticleMapper {
-    private val outputDateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy")
+    private val outputDateFormatter by lazy {
+        DateTimeFormatter.ofPattern("MMM dd, yyyy")
+    }
 
     @OptIn(ExperimentalTime::class)
     private fun formatPublishedAt(publishedAtString: String): String {
         return try {
-            val instant: Instant = Instant.parse(publishedAtString)
-            val now = Instant.now()
+            val instant = Tools.then(publishedAtString)
+            val now = Tools.now()
             val duration = Duration.between(instant, now)
 
             when {

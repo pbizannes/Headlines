@@ -1,3 +1,50 @@
 <resources>
     <string name="app_name">Headlines</string>
+    <!-- Headlines Screen -->
+    <string name="headlines_title">Headlines</string>
+<!--    <string name="headlines_empty">No headlines available at the moment. Please try again later.</string>-->
+    <string name="headlines_error_fetching">Error fetching headlines: %1$s</string> <!-- Example with placeholder -->
+    <string name="article_bookmarked">Article bookmarked</string>
+    <string name="article_bookmark_removed">Bookmark removed</string>
+    <string name="article_tap_to_read">Tap to read full story</string>
+    <string name="article_image_description">Image for article titled %1$s</string>
+    <string name="bookmark_icon_description">Bookmark article</string>
+    <string name="unbookmark_icon_description">Remove bookmark from article</string>
+
+    <!-- Sources Screen -->
+    <string name="sources_title">News Sources</string>
+    <string name="sources_select_all">ALL</string>
+    <string name="sources_select_none">NONE</string>
+    <string name="sources_empty">No news sources available.</string>
+    <string name="sources_error_fetching">Error: %1$s</string>
+    <string name="sources_retry_button">Retry</string>
+    <string name="source_item_description">News source: %1$s</string>
+
+    <!-- Saved Articles Screen -->
+    <string name="saved_articles_title">Saved Articles</string>
+    <string name="saved_articles_empty">No articles saved yet. Start bookmarking your favorites!</string>
+    <string name="saved_articles_error">Error loading saved articles: %1$s</string>
+    <string name="delete_article_icon_description">Delete saved article</string>
+    <string name="clear_all_saved_articles_button">Clear All</string>
+    <string name="dialog_clear_all_title">Clear All Saved Articles?</string>
+    <string name="dialog_clear_all_message">Are you sure you want to delete all your saved articles? This action cannot be undone.</string>
+    <string name="dialog_button_confirm">Confirm</string>
+    <string name="dialog_button_cancel">Cancel</string>
+
+    <!-- WebView Screen -->
+    <string name="webview_title_loading">Loading Article...</string>
+    <string name="webview_close_button_description">Close article view</string>
+    <string name="webview_back_button_description">Navigate back</string>
+
+    <!-- Bottom Navigation -->
+    <string name="bottom_nav_headlines">Headlines</string>
+    <string name="bottom_nav_sources">Sources</string>
+    <string name="bottom_nav_saved">Saved</string>
+    <string name="content_desc_navigate_headlines">Navigate to Headlines</string>
+    <string name="content_desc_navigate_sources">Navigate to Sources</string>
+    <string name="content_desc_navigate_saved">Navigate to Saved Articles</string>
+
+    <!-- General -->
+    <string name="error_generic">An unexpected error occurred.</string>
+    <string name="loading">Loading...</string>
 </resources>

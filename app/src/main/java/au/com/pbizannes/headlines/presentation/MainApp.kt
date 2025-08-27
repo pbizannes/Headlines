@@ -13,6 +13,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -50,7 +51,8 @@ fun MainApp(modifier: Modifier = Modifier) {
                                 contentDescription = destination.contentDescription
                             )
                         },
-                        label = { Text(destination.label) }
+                        label = { Text(destination.label) },
+                        modifier = Modifier.testTag(destination.label)
                     )
                 }
             }

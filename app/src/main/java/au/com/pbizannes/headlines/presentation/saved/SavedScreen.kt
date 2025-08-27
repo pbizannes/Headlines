@@ -29,10 +29,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import au.com.pbizannes.headlines.R
 import au.com.pbizannes.headlines.presentation.WebViewScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,7 +51,7 @@ fun SavedScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Saved Articles") },
+                title = { Text(stringResource(R.string.saved_articles_title)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary, // Or another suitable color
                     titleContentColor = Color.White
@@ -64,7 +67,8 @@ fun SavedScreen(
                             )
                         }
                     }
-                }
+                },
+                modifier = Modifier.testTag(stringResource(R.string.saved_articles_title))
             )
         }
     ) { paddingValues ->

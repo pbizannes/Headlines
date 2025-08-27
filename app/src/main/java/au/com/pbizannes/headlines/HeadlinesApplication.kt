@@ -9,6 +9,6 @@ class HeadlinesApplication: Application() {
     override fun onCreate() {
         super.onCreate()
         if (BuildConfig.BUILD_TYPE == "debug")
-            WebView.setWebContentsDebuggingEnabled(true);
+            WebView.setWebContentsDebuggingEnabled(true)
     }
 }

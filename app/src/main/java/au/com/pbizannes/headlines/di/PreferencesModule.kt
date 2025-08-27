@@ -1,7 +1,8 @@
 package au.com.pbizannes.headlines.di
 
 import android.content.Context
-import au.com.pbizannes.headlines.data.preferences.UserPreferencesRepository
+import au.com.pbizannes.headlines.data.preferences.DefaultUserPreferencesRepository
+import au.com.pbizannes.headlines.domain.repository.UserPreferencesRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,6 +19,6 @@ object PreferencesModule {
     fun provideUserPreferencesRepository(
         @ApplicationContext context: Context
     ): UserPreferencesRepository {
-        return UserPreferencesRepository(context)
+        return DefaultUserPreferencesRepository(context)
     }
 }

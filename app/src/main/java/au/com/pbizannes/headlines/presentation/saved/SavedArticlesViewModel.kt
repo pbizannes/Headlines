@@ -27,7 +27,7 @@ class SavedArticlesViewModel @Inject constructor(
 
     val uiState: StateFlow<SavedArticlesUiState> =
         articleRepository.getAllBookmarkedArticles() // Assuming this returns Flow<List<Article>>
-            .map<List<Article>, SavedArticlesUiState> { articles ->
+            .map    <List<Article>, SavedArticlesUiState> { articles ->
                 if (articles.isEmpty()) {
                     SavedArticlesUiState.Empty
                 } else {

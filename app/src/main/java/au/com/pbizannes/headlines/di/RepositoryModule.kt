@@ -17,7 +17,7 @@ import javax.inject.Singleton
 object RepositoryModule {
     @Provides
     @Singleton
-    fun provideInvoiceRepository(newsService: NewsService): NewsRepository =
+    fun provideNewsRepository(newsService: NewsService): NewsRepository =
         DefaultNewsRepository(newsService = newsService)
 
     @Provides

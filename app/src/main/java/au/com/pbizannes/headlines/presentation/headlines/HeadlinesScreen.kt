@@ -17,7 +17,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import au.com.pbizannes.headlines.R
 import au.com.pbizannes.headlines.domain.model.Article
 import au.com.pbizannes.headlines.presentation.HeadlinesUIState
 
@@ -36,11 +39,12 @@ fun HeadlinesScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Headlines") },
+                title = { Text(stringResource(R.string.headlines_title)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White
-                )
+                ),
+                modifier = Modifier.testTag(stringResource(R.string.headlines_title))
             )
         }
     ) { paddingValues ->
