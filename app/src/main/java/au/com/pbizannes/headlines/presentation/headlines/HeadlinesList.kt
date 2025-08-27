@@ -12,6 +12,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.pbizannes.headlines.domain.model.Article
 import au.com.pbizannes.headlines.domain.model.ArticleSource
 import au.com.pbizannes.headlines.presentation.components.ArticleComponent
+import au.com.pbizannes.headlines.presentation.mapper.ArticleMapper
 
 @Composable
 fun HeadlinesList(

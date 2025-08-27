@@ -19,7 +19,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.pbizannes.headlines.domain.model.Article
+import au.com.pbizannes.headlines.presentation.mapper.ArticleMapper
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.flow.Flow
@@ -46,6 +46,7 @@ fun ArticleComponent(
 ) {
     val isBookmarked by isBookmarkedFlow.collectAsStateWithLifecycle(initialValue = false)
 
+    val displayableArticle = ArticleMapper.toPresentation(article)
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -111,11 +112,11 @@ fun ArticleComponent(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = article.source.name,
+                    text = displayableArticle.source,
                     style = MaterialTheme.typography.labelSmall
                 )
                 Text(
-                    text = article.publishedAt, // Consider formatting this date
+                    text = displayableArticle.publishedAtFormatted, // Consider formatting this date
                     style = MaterialTheme.typography.labelSmall
                 )
             }
@@ -134,7 +135,7 @@ fun ArticleComponentNotBookmarkedPreview() {
         description = "This is a sample description for the article to see how it looks.",
         url = "https://example.com/sample",
         urlToImage = "https://via.placeholder.com/600x400.png?text=Article+Image",
-        publishedAt = "2023-01-01T12:00:00Z",
+        publishedAt = "2023-01-02T14:00:00Z",
         content = "Sample content..."
     )
     MaterialTheme { // Wrap in your app's theme for accurate preview

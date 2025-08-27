@@ -101,11 +101,13 @@ fun AccompanistWebviewComponent(
                     // Configure WebView settings if needed
                     createdWebView.settings.javaScriptEnabled = true
                     createdWebView.settings.allowFileAccess = true
-                    createdWebView.settings.setDomStorageEnabled(true);
 
-                    // Add other settings like zoom controls, etc.
-                    // webView.settings.builtInZoomControls = true
-                    // webView.settings.displayZoomControls = false
+                    // some websites require dom storage
+                    createdWebView.settings.domStorageEnabled = true;
+
+                    // allow zoom in and out for websites
+                    createdWebView.settings.builtInZoomControls = true
+                    createdWebView.settings.displayZoomControls = false
                 },
                 // Optional: Provide a custom WebViewClient
                 client = object : AccompanistWebViewClient() {
