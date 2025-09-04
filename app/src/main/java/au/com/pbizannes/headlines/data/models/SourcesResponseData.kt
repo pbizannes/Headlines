@@ -1,13 +1,13 @@
-package au.com.pbizannes.headlines.domain.model
+package au.com.pbizannes.headlines.data.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SourcesResponse(
+data class SourcesResponseData(
     @SerialName("status")
     val status: String,
 
     @SerialName("sources")
-    val sources: List<NewsSource>
+    val sources: List<NewsSourceData>
 )

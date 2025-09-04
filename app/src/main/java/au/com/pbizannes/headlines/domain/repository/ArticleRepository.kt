@@ -1,6 +1,6 @@
 package au.com.pbizannes.headlines.domain.repository
 
-import au.com.pbizannes.headlines.domain.model.Article
+import au.com.pbizannes.headlines.domain.models.Article
 import kotlinx.coroutines.flow.Flow
 
 interface ArticleRepository {

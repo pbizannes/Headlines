@@ -2,8 +2,8 @@ package au.com.pbizannes.headlines.data
 
 import app.cash.turbine.test
 import au.com.pbizannes.headlines.data.source.local.ArticleDao
-import au.com.pbizannes.headlines.domain.model.Article
-import au.com.pbizannes.headlines.domain.model.ArticleSource
+import au.com.pbizannes.headlines.data.models.ArticleData
+import au.com.pbizannes.headlines.data.models.ArticleSourceData
 import io.mockk.coEvery
 import io.mockk.coJustRun
 import io.mockk.coVerify
@@ -21,8 +21,8 @@ class DefaultArticleRepositoryTest {
     private lateinit var mockArticleDao: ArticleDao
     private lateinit var repository: DefaultArticleRepository
 
-    private val testSource = ArticleSource("src1", "Source 1")
-    private val testArticle = Article("url1", testSource, "author", "title", "desc", "img", Instant.now().toString(), "content")
+    private val testSource = ArticleSourceData("src1", "Source 1")
+    private val testArticleData = ArticleData("url1", testSource, "author", "title", "desc", "img", Instant.now().toString(), "content")
 
     @Before
     fun setUp() {
@@ -39,14 +39,14 @@ class DefaultArticleRepositoryTest {
 
     @Test
     fun `saveArticle calls dao insertArticle`() = runTest {
-        repository.saveArticle(testArticle)
-        coVerify { mockArticleDao.insertArticle(testArticle) }
+        repository.saveArticle(testArticleData)
+        coVerify { mockArticleDao.insertArticle(testArticleData) }
     }
 
     @Test
     fun `deleteArticle calls dao deleteArticle`() = runTest {
-        repository.deleteArticle(testArticle)
-        coVerify { mockArticleDao.deleteArticle(testArticle) }
+        repository.deleteArticle(testArticleData)
+        coVerify { mockArticleDao.deleteArticle(testArticleData) }
     }
 
     @Test
@@ -69,24 +69,24 @@ class DefaultArticleRepositoryTest {
     @Test
     fun `getArticleByUrl calls dao getArticleByUrl and returns result`() = runTest {
         val testUrl = "test_url"
-        coEvery { mockArticleDao.getArticleByUrl(testUrl) } returns testArticle
+        coEvery { mockArticleDao.getArticleByUrl(testUrl) } returns testArticleData
 
         val result = repository.getArticleByUrl(testUrl)
 
-        Assert.assertEquals(testArticle, result)
+        Assert.assertEquals(testArticleData, result)
         coVerify { mockArticleDao.getArticleByUrl(testUrl) }
     }
 
 
     @Test
     fun `getAllSavedArticles returns flow from dao getAllArticles`() = runTest {
-        val articles = listOf(testArticle)
+        val articles = listOf(testArticleData)
         every { mockArticleDao.getAllArticles() } returns flowOf(articles)
 
         repository.getAllBookmarkedArticles().test {
             val emittedList = awaitItem()
             Assert.assertEquals(1, emittedList.size)
-            Assert.assertEquals(testArticle.url, emittedList[0].url)
+            Assert.assertEquals(testArticleData.url, emittedList[0].url)
             awaitComplete()
         }
     }

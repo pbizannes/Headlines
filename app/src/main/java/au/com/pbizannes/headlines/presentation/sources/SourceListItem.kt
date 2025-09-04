@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import au.com.pbizannes.headlines.domain.model.NewsSource
+import au.com.pbizannes.headlines.domain.models.NewsSource
 
 @Composable
 fun SourceListItem(
@@ -31,7 +31,6 @@ fun SourceListItem(
         modifier = modifier
             .fillMaxWidth()
             .clickable {
-                // Clicking the row also toggles the checkbox
                 source.id?.let { id -> onCheckedChange(id, !itemState.isSelected) }
             }
             .padding(horizontal = 16.dp, vertical = 12.dp),
@@ -59,10 +58,10 @@ fun SourceListItem(
             onCheckedChange = { isChecked ->
                 source.id?.let { id -> onCheckedChange(id, isChecked) }
             },
-            enabled = source.id != null // Disable checkbox if source ID is null
+            enabled = source.id != null
         )
     }
-    Divider() // Optional: add a divider between items
+    Divider()
 }
 
 @Preview(showBackground = true, name = "Source List Item - Selected")

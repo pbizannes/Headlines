@@ -1,12 +1,12 @@
-package au.com.pbizannes.headlines.domain.model
+package au.com.pbizannes.headlines.data.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class NewsSource(
+data class NewsSourceData(
     @SerialName("id")
-    val id: String?, // Making it nullable as sometimes IDs can be missing or null in APIs
+    val id: String,
 
     @SerialName("name")
     val name: String,

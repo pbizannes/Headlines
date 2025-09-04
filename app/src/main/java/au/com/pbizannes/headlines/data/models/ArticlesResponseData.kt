@@ -1,10 +1,10 @@
-package au.com.pbizannes.headlines.domain.model
+package au.com.pbizannes.headlines.data.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ArticlesResponse(
+data class ArticlesResponseData(
     @SerialName("status")
     val status: String,
 
@@ -12,5 +12,5 @@ data class ArticlesResponse(
     val totalResults: Int,
 
     @SerialName("articles")
-    val articles: List<Article>
+    val articleEntities: List<ArticleData>
 )

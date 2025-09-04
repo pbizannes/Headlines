@@ -33,11 +33,10 @@ enum class NavBarDestination(
 
 object WebViewScreen {
     const val ROUTE_PREFIX = "webView"
-    const val ARG_URL = "url" // Argument name for the URL
-    val route = "$ROUTE_PREFIX/{$ARG_URL}" // Route with a URL argument
+    const val ARG_URL = "url"
+    val route = "$ROUTE_PREFIX/{$ARG_URL}"
 
     fun createRoute(url: String): String {
-        // Important: Encode the URL to handle special characters safely
         val encodedUrl = java.net.URLEncoder.encode(url, "UTF-8")
         return "$ROUTE_PREFIX/$encodedUrl"
     }

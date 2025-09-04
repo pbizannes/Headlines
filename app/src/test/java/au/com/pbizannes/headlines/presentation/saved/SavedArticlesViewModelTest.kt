@@ -1,8 +1,8 @@
 package au.com.pbizannes.headlines.presentation.saved
 
 import app.cash.turbine.test
-import au.com.pbizannes.headlines.domain.model.Article
-import au.com.pbizannes.headlines.domain.model.ArticleSource
+import au.com.pbizannes.headlines.data.models.ArticleData
+import au.com.pbizannes.headlines.data.models.ArticleSourceData
 import au.com.pbizannes.headlines.domain.repository.ArticleRepository
 import io.mockk.coEvery
 import io.mockk.coJustRun
@@ -26,10 +26,10 @@ class SavedArticlesViewModelTest {
     private lateinit var mockArticleRepository: ArticleRepository
     private lateinit var viewModel: SavedArticlesViewModel
 
-    private val articleSource = ArticleSource(id = "test-src", name = "Test Source")
-    private val savedArticle1 = Article("url1", articleSource, "Author 1", "Saved Title 1", "Desc 1", "img1",
+    private val articleSource = ArticleSourceData(id = "test-src", name = "Test Source")
+    private val savedArticleData1 = ArticleData("url1", articleSource, "Author 1", "Saved Title 1", "Desc 1", "img1",
         Instant.now().toString(), "Content1")
-    private val savedArticle2 = Article("url2", articleSource, "Author 2", "Saved Title 2", "Desc 2", "img2", Instant.now().minusSeconds(300).toString(), "Content2")
+    private val savedArticleData2 = ArticleData("url2", articleSource, "Author 2", "Saved Title 2", "Desc 2", "img2", Instant.now().minusSeconds(300).toString(), "Content2")
 
     @Before
     fun setUp() {
@@ -54,7 +54,7 @@ class SavedArticlesViewModelTest {
 
     @Test
     fun `uiState emits Loading then Success with articles when repository returns saved articles`() = runTest {
-        val savedArticles = listOf(savedArticle1, savedArticle2)
+        val savedArticles = listOf(savedArticleData1, savedArticleData2)
         every { mockArticleRepository.getAllBookmarkedArticles() } returns flowOf(savedArticles)
         viewModel = SavedArticlesViewModel(mockArticleRepository)
 
@@ -90,8 +90,8 @@ class SavedArticlesViewModelTest {
 
     @Test
     fun `deleteSavedArticle calls repository deleteArticle`() = runTest {
-        viewModel.deleteSavedArticle(savedArticle1)
-        coVerify { mockArticleRepository.deleteArticle(savedArticle1) }
+        viewModel.deleteSavedArticle(savedArticleData1)
+        coVerify { mockArticleRepository.deleteArticle(savedArticleData1) }
     }
 
     @Test
@@ -102,12 +102,12 @@ class SavedArticlesViewModelTest {
 
     @Test
     fun `uiState updates when articles are deleted`() = runTest {
-        val initialArticles = listOf(savedArticle1, savedArticle2)
-        val articlesAfterDeletion = listOf(savedArticle2)
+        val initialArticles = listOf(savedArticleData1, savedArticleData2)
+        val articlesAfterDeletion = listOf(savedArticleData2)
 
         val articlesFlowController = MutableStateFlow(initialArticles)
         every { mockArticleRepository.getAllBookmarkedArticles() } returns articlesFlowController
-        coEvery { mockArticleRepository.deleteArticle(savedArticle1) } coAnswers {
+        coEvery { mockArticleRepository.deleteArticle(savedArticleData1) } coAnswers {
             articlesFlowController.value = articlesAfterDeletion // Simulate DB update and flow re-emission
         }
 
@@ -119,11 +119,11 @@ class SavedArticlesViewModelTest {
             val initialState = awaitItem() as SavedArticlesUiState.Success // Initial success
             Assert.assertEquals(2, initialState.articles.size)
 
-            viewModel.deleteSavedArticle(savedArticle1) // Trigger deletion
+            viewModel.deleteSavedArticle(savedArticleData1) // Trigger deletion
 
             val updatedState = awaitItem() as SavedArticlesUiState.Success // State after deletion
             Assert.assertEquals(1, updatedState.articles.size)
-            Assert.assertEquals(savedArticle2.url, updatedState.articles[0].url)
+            Assert.assertEquals(savedArticleData2.url, updatedState.articles[0].url)
 
             cancelAndConsumeRemainingEvents()
         }

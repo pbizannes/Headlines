@@ -7,11 +7,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import au.com.pbizannes.headlines.domain.model.Article
+import au.com.pbizannes.headlines.domain.models.Article
 
 @Composable
 fun SavedArticlesList(
-    articles: List<Article>,
+    articleEntities: List<Article>,
     onArticleClick: (Article) -> Unit,
     onDeleteClick: (Article) -> Unit,
     modifier: Modifier = Modifier
@@ -21,8 +21,8 @@ fun SavedArticlesList(
         contentPadding = PaddingValues(vertical = 8.dp)
     ) {
         items(
-            items = articles,
-            key = { article -> article.url } // Use a stable key
+            items = articleEntities,
+            key = { article -> article.url }
         ) { article ->
             SavedArticleItem(
                 article = article,

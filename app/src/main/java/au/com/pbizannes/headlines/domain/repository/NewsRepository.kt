@@ -1,9 +1,10 @@
 package au.com.pbizannes.headlines.domain.repository
 
-import au.com.pbizannes.headlines.domain.model.Article
-import au.com.pbizannes.headlines.domain.model.ArticleSource
-import au.com.pbizannes.headlines.domain.model.NewsSource
-import kotlinx.coroutines.flow.Flow
+import au.com.pbizannes.headlines.domain.models.Article
+import au.com.pbizannes.headlines.data.models.ArticleSourceData
+import au.com.pbizannes.headlines.data.models.NewsSourceData
+import au.com.pbizannes.headlines.domain.models.ArticleSource
+import au.com.pbizannes.headlines.domain.models.NewsSource
 
 /**
  * Repository for news, news sources, selected sources and selected news.
@@ -14,5 +15,5 @@ interface NewsRepository {
      */
     suspend fun getSources(): Result<List<NewsSource>>
 
-    suspend fun getHeadlines(sources: List<ArticleSource>): Flow<Article>
+    suspend fun getHeadlines(sources: List<ArticleSource>): Result<List<Article>>
 }

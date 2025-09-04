@@ -2,12 +2,12 @@ package au.com.pbizannes.headlines.data
 
 import au.com.pbizannes.headlines.BuildConfig
 import au.com.pbizannes.headlines.data.source.network.NewsService
-import au.com.pbizannes.headlines.domain.model.Article
-import au.com.pbizannes.headlines.domain.model.ArticleSource
-import au.com.pbizannes.headlines.domain.model.NewsSource
+import au.com.pbizannes.headlines.domain.mapper.toDomainArticleList
+import au.com.pbizannes.headlines.domain.mapper.toDomainNewsSourceList
+import au.com.pbizannes.headlines.domain.models.Article
+import au.com.pbizannes.headlines.domain.models.ArticleSource
+import au.com.pbizannes.headlines.domain.models.NewsSource
 import au.com.pbizannes.headlines.domain.repository.NewsRepository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
 
 class DefaultNewsRepository(val newsService: NewsService) : NewsRepository {
     val apiKey = BuildConfig.API_KEY
@@ -18,7 +18,7 @@ class DefaultNewsRepository(val newsService: NewsService) : NewsRepository {
             val responseBody = response.body()
             if (response.isSuccessful) {
                 if (responseBody != null) {
-                    Result.success(responseBody.sources)
+                    Result.success(responseBody.sources.toDomainNewsSourceList())
                 } else {
                     Result.failure(NoSuchElementException())
                 }
@@ -30,9 +30,10 @@ class DefaultNewsRepository(val newsService: NewsService) : NewsRepository {
         }
     }
 
-    override suspend fun getHeadlines(sources: List<ArticleSource>): Flow<Article> {
+    override suspend fun getHeadlines(sources: List<ArticleSource>): Result<List<Article>> {
+        val country = if (sources.isEmpty()) "us" else null
+
         return try {
-            val country = if (sources.isEmpty()) "us" else null
             val response = newsService.getHeadlines(
                 apiKey = apiKey,
                 country = country,
@@ -41,12 +42,16 @@ class DefaultNewsRepository(val newsService: NewsService) : NewsRepository {
 
             val responseBody = response.body()
             if (response.isSuccessful) {
-                responseBody?.articles?.asFlow() ?: throw NoSuchElementException()
+                if (responseBody != null) {
+                    Result.success(responseBody.articleEntities.toDomainArticleList())
+                } else {
+                    Result.failure(NoSuchElementException())
+                }
             } else {
-                throw NoSuchElementException()
+                Result.failure(NoSuchElementException())
             }
         } catch (error: Exception) {
-            throw error
+            Result.failure(NoSuchElementException())
         }
     }
 }

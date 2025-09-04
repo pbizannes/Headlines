@@ -1,4 +1,4 @@
-package au.com.pbizannes.headlines.domain.model
+package au.com.pbizannes.headlines.data.models
 
 import androidx.room.Embedded
 import androidx.room.Entity
@@ -8,14 +8,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @Entity(tableName = "articles")
-data class Article(
+data class ArticleData(
     @PrimaryKey
     @SerialName("url")
     val url: String,
 
     @Embedded
     @SerialName("source")
-    val source: ArticleSource,
+    val source: ArticleSourceData,
 
     @SerialName("author")
     val author: String?, // Author can sometimes be null
@@ -30,7 +30,7 @@ data class Article(
     val urlToImage: String?, // URL to image can sometimes be null
 
     @SerialName("publishedAt")
-    val publishedAt: String, // You might want to parse this into a Date/Time object later
+    val publishedAt: String,
 
     @SerialName("content")
     val content: String? // Content can sometimes be null

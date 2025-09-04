@@ -34,12 +34,11 @@ import com.google.accompanist.web.rememberWebViewState
 @Composable
 fun AccompanistWebviewComponent(
     urlToLoad: String,
-    onNavigateUp: () -> Unit // Callback to navigate back from this screen
+    onNavigateUp: () -> Unit
 ) {
     val webViewState = rememberWebViewState(url = urlToLoad)
     val webViewNavigator = rememberWebViewNavigator()
 
-    // Handle back press to navigate within WebView if possible, otherwise navigate up
     BackHandler(enabled = webViewNavigator.canGoBack) {
         webViewNavigator.navigateBack()
     }
@@ -69,7 +68,6 @@ fun AccompanistWebviewComponent(
                     }
                 },
                 actions = {
-                    // Optional: Add a close button to directly exit the WebView screen
                     IconButton(onClick = onNavigateUp) {
                         Icon(
                             imageVector = Icons.Filled.Close,
@@ -101,7 +99,6 @@ fun AccompanistWebviewComponent(
                 modifier = Modifier.weight(1f).testTag("webview"),
                 navigator = webViewNavigator,
                 onCreated = { createdWebView ->
-                    // Configure WebView settings if needed
                     createdWebView.settings.javaScriptEnabled = true
                     createdWebView.settings.allowFileAccess = true
 
@@ -112,7 +109,6 @@ fun AccompanistWebviewComponent(
                     createdWebView.settings.builtInZoomControls = true
                     createdWebView.settings.displayZoomControls = false
                 },
-                // Optional: Provide a custom WebViewClient
                 client = object : AccompanistWebViewClient() {
                     override fun onPageStarted(
                         view: WebView,
@@ -120,12 +116,10 @@ fun AccompanistWebviewComponent(
                         favicon: Bitmap?
                     ) {
                         super.onPageStarted(view, url, favicon)
-                        // Page loading started
                     }
 
                     override fun onPageFinished(view: WebView, url: String?) {
                         super.onPageFinished(view, url)
-                        // Page loading finished
                     }
                 }
             )

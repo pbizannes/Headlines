@@ -1,6 +1,6 @@
 package au.com.pbizannes.headlines.presentation
 
-import au.com.pbizannes.headlines.domain.model.Article
+import au.com.pbizannes.headlines.domain.models.Article
 
 sealed interface HeadlinesUIState {
     object Loading : HeadlinesUIState

@@ -34,7 +34,6 @@ import au.com.pbizannes.headlines.R
 @Composable
 fun SourcesScreen(
     viewModel: SourcesViewModel = hiltViewModel()
-    // You can add NavController here if needed for navigation from this screen
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -43,11 +42,10 @@ fun SourcesScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.sources_title)) },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary, // Or another suitable color
+                    containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White
                 ),
                 actions = {
-                    // Optional: Add Select All / Deselect All buttons
                     val currentState = uiState
                     if (currentState is SourcesScreenUiState.Success && currentState.sourceItems.isNotEmpty()) {
                         Row {
@@ -125,7 +123,7 @@ fun SourcesList(
     ) {
         items(
             items = sourceItems,
-            key = { itemState -> itemState.source.id ?: itemState.source.name } // Use id or name as key
+            key = { itemState -> itemState.source.id }
         ) { itemState ->
             SourceListItem(
                 itemState = itemState,

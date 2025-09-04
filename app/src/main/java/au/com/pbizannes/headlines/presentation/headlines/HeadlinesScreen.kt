@@ -21,7 +21,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.pbizannes.headlines.R
-import au.com.pbizannes.headlines.domain.model.Article
+import au.com.pbizannes.headlines.domain.models.Article
 import au.com.pbizannes.headlines.presentation.HeadlinesUIState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,7 +51,7 @@ fun HeadlinesScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues) // Apply padding from Scaffold
+                .padding(paddingValues)
         ) {
             when (val state = uiState) {
                 is HeadlinesUIState.Loading -> {

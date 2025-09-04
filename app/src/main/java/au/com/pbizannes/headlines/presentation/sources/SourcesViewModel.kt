@@ -2,7 +2,7 @@ package au.com.pbizannes.headlines.presentation.sources
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.pbizannes.headlines.domain.model.NewsSource
+import au.com.pbizannes.headlines.domain.models.NewsSource
 import au.com.pbizannes.headlines.domain.repository.NewsRepository
 import au.com.pbizannes.headlines.domain.repository.UserPreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-// UI State for Sources Screen
 data class SourceItemUiState(
     val source: NewsSource,
     val isSelected: Boolean
@@ -34,13 +33,9 @@ class SourcesViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
-    // Combine the flow of all sources and the flow of selected source IDs
     val uiState: StateFlow<SourcesScreenUiState> =
         combine(
-            // Flow for all available sources (assuming this is a one-shot fetch converted to Flow or
-            // the repository itself returns a Flow<Result<List<NewsSource>>>)
-            // For simplicity, let's assume getSources() is suspend and we convert its result to a flow here.
-            flow { emit(newsRepository.getSources()) }, // newsRepository.getSources() returns Result<List<NewsSource>>
+            flow { emit(newsRepository.getSources()) },
             userPreferencesRepository.selectedSourceIdsFlow()
         ) { sourcesResult, selectedIds ->
             sourcesResult.fold(
@@ -52,7 +47,6 @@ class SourcesViewModel @Inject constructor(
                         )
                     }
                     if (sourceItemList.isEmpty()) {
-                        // If allSources was empty initially
                         SourcesScreenUiState.Success(emptyList())
                     } else {
                         SourcesScreenUiState.Success(sourceItemList)
@@ -64,7 +58,7 @@ class SourcesViewModel @Inject constructor(
             )
         }
             .onStart { emit(SourcesScreenUiState.Loading) }
-            .catch {e -> // Catch errors from the combine or downstream
+            .catch {e ->
                 emit(SourcesScreenUiState.Error(e.message ?: "An unexpected error occurred"))
             }
             .stateIn(
@@ -80,12 +74,9 @@ class SourcesViewModel @Inject constructor(
             } else {
                 userPreferencesRepository.removeSourceId(sourceId)
             }
-            // The uiState will automatically update because selectedSourceIdsFlow will emit a new set,
-            // triggering the 'combine' operator to re-evaluate.
         }
     }
 
-    // Optional: Functions to select all or none
     fun selectAllSources() {
         viewModelScope.launch {
             val currentState = uiState.value

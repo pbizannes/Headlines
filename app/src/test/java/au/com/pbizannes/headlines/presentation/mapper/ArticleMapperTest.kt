@@ -1,7 +1,7 @@
 package au.com.pbizannes.headlines.presentation.mapper
 
-import au.com.pbizannes.headlines.domain.model.Article
-import au.com.pbizannes.headlines.domain.model.ArticleSource
+import au.com.pbizannes.headlines.data.models.ArticleData
+import au.com.pbizannes.headlines.data.models.ArticleSourceData
 import au.com.pbizannes.headlines.util.Tools
 import io.mockk.every
 import io.mockk.mockkObject
@@ -22,8 +22,8 @@ class ArticleMapperTest {
 
     @Test
     fun `toPresentation maps domain Article to ArticleUi correctly`() {
-        val domainSource = ArticleSource(id = "test-source", name = "Test Source Name")
-        val domainArticle = Article(
+        val domainSource = ArticleSourceData(id = "test-source", name = "Test Source Name")
+        val domainArticleData = ArticleData(
             url = "http://example.com/article1",
             source = domainSource,
             author = "Test Author",
@@ -34,7 +34,7 @@ class ArticleMapperTest {
             content = "Test Content"
         )
 
-        val articleUi = ArticleMapper.toPresentation(domainArticle)
+        val articleUi = ArticleMapper.toPresentation(domainArticleData)
 
         Assert.assertEquals("http://example.com/article1", articleUi.url)
         Assert.assertEquals("Test Source Name", articleUi.source)
@@ -48,9 +48,9 @@ class ArticleMapperTest {
 
     @Test
     fun `toPresentation formats date a few hours ago`() {
-        val domainSource = ArticleSource(id = "test-source", name = "Test Source Name")
+        val domainSource = ArticleSourceData(id = "test-source", name = "Test Source Name")
         val fewHoursAgo = Tools.now().minus(3, ChronoUnit.HOURS).toString()
-        val domainArticle = Article(
+        val domainArticleData = ArticleData(
             url = "http://example.com/article2",
             source = domainSource,
             author = null,
@@ -61,7 +61,7 @@ class ArticleMapperTest {
             content = null
         )
 
-        val articleUi = ArticleMapper.toPresentation(domainArticle)
+        val articleUi = ArticleMapper.toPresentation(domainArticleData)
 
         Assert.assertEquals("3h ago", articleUi.publishedAtFormatted) // Assuming API >= 26
     }
@@ -69,9 +69,9 @@ class ArticleMapperTest {
 
     @Test
     fun `toPresentation formats date many days ago`() {
-        val domainSource = ArticleSource(id = "test-source", name = "Test Source Name")
+        val domainSource = ArticleSourceData(id = "test-source", name = "Test Source Name")
         val manyDaysAgo = Tools.now().minus(10, ChronoUnit.DAYS).toString()
-        val domainArticle = Article(
+        val domainArticleData = ArticleData(
             url = "http://example.com/article3",
             source = domainSource,
             author = "Author",
@@ -82,26 +82,26 @@ class ArticleMapperTest {
             content = "Content"
         )
 
-        val articleUi = ArticleMapper.toPresentation(domainArticle)
+        val articleUi = ArticleMapper.toPresentation(domainArticleData)
 
         assert(!articleUi.publishedAtFormatted.endsWith("ago"))
     }
 
     @Test
     fun `toPresentationList maps list of domain Articles correctly`() {
-        val domainSource = ArticleSource(id = "test-source", name = "Test Source Name")
-        val domainArticles = listOf(
-            Article(
+        val domainSource = ArticleSourceData(id = "test-source", name = "Test Source Name")
+        val domainArticleEntities = listOf(
+            ArticleData(
                 url = "url1", source = domainSource, author = "A1", title = "T1",
                 description = "D1", urlToImage = "I1", publishedAt = Tools.now().toString(), content = "C1"
             ),
-            Article(
+            ArticleData(
                 url = "url2", source = domainSource, author = "A2", title = "T2",
                 description = "D2", urlToImage = "I2", publishedAt = Tools.now().minus(1, ChronoUnit.DAYS).toString(), content = "C2"
             )
         )
 
-        val articleUiList = ArticleMapper.toPresentationList(domainArticles)
+        val articleUiList = ArticleMapper.toPresentationList(domainArticleEntities)
 
         Assert.assertEquals(2, articleUiList.size)
         Assert.assertEquals("url1", articleUiList[0].url)

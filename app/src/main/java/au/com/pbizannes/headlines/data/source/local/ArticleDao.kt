@@ -5,22 +5,22 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import au.com.pbizannes.headlines.domain.model.Article
+import au.com.pbizannes.headlines.data.models.ArticleData
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ArticleDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE) // Replace if article with same URL already exists
-    suspend fun insertArticle(article: Article)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertArticle(articleData: ArticleData)
 
-    @Query("SELECT * FROM articles ORDER BY publishedAt DESC") // Get all articles, newest first
-    fun getAllArticles(): Flow<List<Article>> // Use Flow for reactive updates
+    @Query("SELECT * FROM articles ORDER BY publishedAt DESC")
+    fun getAllArticles(): Flow<List<ArticleData>>
 
     @Query("SELECT * FROM articles WHERE url = :articleUrl")
-    suspend fun getArticleByUrl(articleUrl: String): Article?
+    suspend fun getArticleByUrl(articleUrl: String): ArticleData?
 
     @Delete
-    suspend fun deleteArticle(article: Article)
+    suspend fun deleteArticle(articleData: ArticleData)
 
     @Query("DELETE FROM articles")
     suspend fun deleteAllArticles()

@@ -1,7 +1,7 @@
 package au.com.pbizannes.headlines.presentation.sources
 
 import app.cash.turbine.test
-import au.com.pbizannes.headlines.domain.model.NewsSource
+import au.com.pbizannes.headlines.data.models.NewsSourceData
 import au.com.pbizannes.headlines.domain.repository.NewsRepository
 import au.com.pbizannes.headlines.domain.repository.UserPreferencesRepository
 import io.mockk.coEvery
@@ -11,7 +11,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -27,9 +26,9 @@ class SourcesViewModelTest {
     private lateinit var viewModel: SourcesViewModel
 
     // Sample Data
-    private val source1 = NewsSource("src1", "Source One", "Desc1", "url1", "cat1", "lang1", "country1")
-    private val source2 = NewsSource("src2", "Source Two", "Desc2", "url2", "cat2", "lang2", "country2")
-    private val source3 = NewsSource("src3", "Source Three", "Desc3", "url3", "cat3", "lang3", "country3")
+    private val source1 = NewsSourceData("src1", "Source One", "Desc1", "url1", "cat1", "lang1", "country1")
+    private val source2 = NewsSourceData("src2", "Source Two", "Desc2", "url2", "cat2", "lang2", "country2")
+    private val source3 = NewsSourceData("src3", "Source Three", "Desc3", "url3", "cat3", "lang3", "country3")
     private val allDomainSources = listOf(source1, source2, source3)
 
     @Before

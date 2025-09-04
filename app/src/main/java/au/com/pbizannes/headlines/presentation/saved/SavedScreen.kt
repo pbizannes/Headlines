@@ -1,11 +1,8 @@
 package au.com.pbizannes.headlines.presentation.saved
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material3.AlertDialog
@@ -31,8 +28,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.error
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import au.com.pbizannes.headlines.R
@@ -42,7 +37,7 @@ import au.com.pbizannes.headlines.presentation.WebViewScreen
 @Composable
 fun SavedScreen(
     viewModel: SavedArticlesViewModel = hiltViewModel(),
-    navController: NavHostController // For navigating to WebView
+    navController: NavHostController
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -53,11 +48,10 @@ fun SavedScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.saved_articles_title)) },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary, // Or another suitable color
+                    containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White
                 ),
                 actions = {
-                    // Show delete all button only if there are articles
                     if (uiState is SavedArticlesUiState.Success && (uiState as SavedArticlesUiState.Success).articles.isNotEmpty()) {
                         IconButton(onClick = { showDeleteAllDialog = true }) {
                             Icon(
@@ -83,7 +77,7 @@ fun SavedScreen(
                 }
                 is SavedArticlesUiState.Success -> {
                     SavedArticlesList(
-                        articles = state.articles,
+                        articleEntities = state.articles,
                         onArticleClick = { article ->
                             article.url.let { url ->
                                 navController.navigate(WebViewScreen.createRoute(url))

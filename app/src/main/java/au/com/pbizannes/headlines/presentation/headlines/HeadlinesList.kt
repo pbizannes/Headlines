@@ -10,8 +10,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import au.com.pbizannes.headlines.domain.model.Article
-import au.com.pbizannes.headlines.domain.model.ArticleSource
+import au.com.pbizannes.headlines.data.models.ArticleData
+import au.com.pbizannes.headlines.data.models.ArticleSourceData
+import au.com.pbizannes.headlines.domain.mapper.toDomainArticleList
+import au.com.pbizannes.headlines.domain.models.Article
 import au.com.pbizannes.headlines.presentation.components.ArticleComponent
 import au.com.pbizannes.headlines.ui.theme.HeadlinesTheme
 
@@ -24,12 +26,11 @@ fun HeadlinesList(
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(vertical = 8.dp) // Add some padding around the list
+        contentPadding = PaddingValues(vertical = 8.dp)
     ) {
-        // The 'items' extension function is the simplest way to display a list
         items(
             items = articles,
-            key = { article -> article.url } // Provide a stable key for each item
+            key = { article -> article.url }
         ) { article ->
             ArticleComponent(
                 article = article,
@@ -47,10 +48,9 @@ fun HeadlinesList(
 @Preview(showBackground = true, name = "Headlines List Preview")
 @Composable
 fun HeadlinesListPreview() {
-    // Create some sample Article data for the preview
-    val sampleArticles = listOf(
-        Article(
-            source = ArticleSource(id = "bbc-news", name = "BBC News"),
+    val sampleArticleEntities = listOf(
+        ArticleData(
+            source = ArticleSourceData(id = "bbc-news", name = "BBC News"),
             author = "BBC News Author",
             title = "Major Event Happens: A Long Title That Might Wrap to Multiple Lines",
             description = "This is a detailed description of the major event that has occurred, providing context and implications for everyone involved.",
@@ -59,8 +59,8 @@ fun HeadlinesListPreview() {
             publishedAt = "2023-10-27T10:00:00Z",
             content = "Full content of the article..."
         ),
-        Article(
-            source = ArticleSource(id = "tech-crunch", name = "TechCrunch"),
+        ArticleData(
+            source = ArticleSourceData(id = "tech-crunch", name = "TechCrunch"),
             author = "Tech Writer",
             title = "New Gadget Released: Innovative Features Unveiled",
             description = "A new groundbreaking gadget has been released today, promising to revolutionize the way we interact with technology. It has many cool features.",
@@ -69,8 +69,8 @@ fun HeadlinesListPreview() {
             publishedAt = "2023-10-27T09:30:00Z",
             content = "More details about the gadget..."
         ),
-        Article(
-            source = ArticleSource(id = null, name = "Local Blog"),
+        ArticleData(
+            source = ArticleSourceData(id = null, name = "Local Blog"),
             author = "Jane Doe",
             title = "Community Update: What's Happening Locally This Week",
             description = "An update on local events and news from our community. Support local initiatives and stay informed.",
@@ -79,8 +79,8 @@ fun HeadlinesListPreview() {
             publishedAt = "2023-10-26T15:00:00Z",
             content = "Further content..."
         ),
-        Article(
-            source = ArticleSource(id = "the-verge", name = "The Verge"),
+        ArticleData(
+            source = ArticleSourceData(id = "the-verge", name = "The Verge"),
             author = "The Verge Staff",
             title = "Science Discovery: Exploring the Cosmos",
             description = "Scientists have made a significant discovery about the universe, opening new avenues for research and understanding.",
@@ -89,13 +89,12 @@ fun HeadlinesListPreview() {
             publishedAt = "2023-10-25T12:00:00Z",
             content = "Deep dive into the science..."
         )
-    )
+    ).toDomainArticleList()
 
     HeadlinesTheme {
         HeadlinesList(
-            articles = sampleArticles,
+            articles = sampleArticleEntities,
             onArticleClick = { article ->
-                // In a preview, you can log or do nothing on click
                 println("Preview: Clicked on article - ${article.title}")
             }
         )

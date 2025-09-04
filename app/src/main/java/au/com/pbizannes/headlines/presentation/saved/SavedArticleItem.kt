@@ -27,8 +27,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import au.com.pbizannes.headlines.domain.model.Article
-import au.com.pbizannes.headlines.domain.model.ArticleSource
+import au.com.pbizannes.headlines.data.models.ArticleData
+import au.com.pbizannes.headlines.data.models.ArticleSourceData
+import au.com.pbizannes.headlines.domain.mapper.toDomainArticle
+import au.com.pbizannes.headlines.domain.models.Article
+import au.com.pbizannes.headlines.presentation.mapper.ArticleMapper
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 
@@ -39,6 +42,7 @@ fun SavedArticleItem(
     onDeleteClick: (Article) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val formattedArticle = ArticleMapper.toPresentation(article)
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -50,7 +54,7 @@ fun SavedArticleItem(
                 .clickable { onArticleClick(article) }
                 .padding(12.dp)
         ) {
-            article.urlToImage?.let { imageUrl ->
+            formattedArticle.urlToImage?.let { imageUrl ->
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(imageUrl)
@@ -77,7 +81,7 @@ fun SavedArticleItem(
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f) // Title takes available space
+                    modifier = Modifier.weight(1f)
                 )
                 IconButton(
                     onClick = { onDeleteClick(article) },
@@ -86,14 +90,14 @@ fun SavedArticleItem(
                     Icon(
                         imageVector = Icons.Filled.Delete,
                         contentDescription = "Delete Saved Article",
-                        tint = MaterialTheme.colorScheme.error // Use error color for delete
+                        tint = MaterialTheme.colorScheme.error
                     )
                 }
             }
 
             Spacer(Modifier.height(4.dp))
 
-            article.description?.let {
+            formattedArticle.description?.let {
                 Text(
                     text = it,
                     style = MaterialTheme.typography.bodyMedium,
@@ -107,11 +111,11 @@ fun SavedArticleItem(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = article.source.name, // Assuming name is not nullable in your final model
+                    text = formattedArticle.source,
                     style = MaterialTheme.typography.labelSmall
                 )
                 Text(
-                    text = article.publishedAt, // Consider formatting
+                    text = formattedArticle.publishedAtFormatted,
                     style = MaterialTheme.typography.labelSmall
                 )
             }
@@ -123,8 +127,8 @@ fun SavedArticleItem(
 @Preview(showBackground = true, name = "Saved Article Item Preview")
 @Composable
 fun SavedArticleItemPreview() {
-    val sampleArticle = Article(
-        source = ArticleSource(id = "sample-source", name = "Sample News Weekly"),
+    val sampleArticleData = ArticleData(
+        source = ArticleSourceData(id = "sample-source", name = "Sample News Weekly"),
         author = "Jane Previewer",
         title = "A Saved Article: Exploring Local Storage Marvels",
         description = "This is a preview of how a saved article item will look within the application. It includes a delete button.",
@@ -132,10 +136,10 @@ fun SavedArticleItemPreview() {
         urlToImage = "https://via.placeholder.com/600x400.png?text=Saved+Article",
         publishedAt = "2023-03-15T10:30:00Z",
         content = "Full content of the saved article goes here..."
-    )
+    ).toDomainArticle()
     MaterialTheme {
         SavedArticleItem(
-            article = sampleArticle,
+            article = sampleArticleData,
             onArticleClick = {},
             onDeleteClick = {}
         )

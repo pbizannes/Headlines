@@ -30,11 +30,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import au.com.pbizannes.headlines.domain.model.Article
+import au.com.pbizannes.headlines.domain.models.Article
+import au.com.pbizannes.headlines.domain.models.ArticleSource
 import au.com.pbizannes.headlines.presentation.mapper.ArticleMapper
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.flow.Flow
+import java.time.Instant
 
 @Composable
 fun ArticleComponent(
@@ -74,7 +76,7 @@ fun ArticleComponent(
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top, // Align title and icon button to the top
+                verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
@@ -85,10 +87,9 @@ fun ArticleComponent(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
                 )
-                // Use IconButton for better accessibility and touch target
                 IconButton(
                     onClick = { onBookmarkToggle(article, !isBookmarked) },
-                    modifier = Modifier.size(40.dp) // Ensure a reasonable touch target
+                    modifier = Modifier.size(40.dp)
                 ) {
                     Icon(
                         imageVector = if (isBookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
@@ -116,7 +117,7 @@ fun ArticleComponent(
                     style = MaterialTheme.typography.labelSmall
                 )
                 Text(
-                    text = displayableArticle.publishedAtFormatted, // Consider formatting this date
+                    text = displayableArticle.publishedAtFormatted,
                     style = MaterialTheme.typography.labelSmall
                 )
             }
@@ -124,24 +125,23 @@ fun ArticleComponent(
     }
 }
 
-// --- Preview for ArticleComponent with Bookmark ---
 @Preview(showBackground = true, name = "Article Item - Not Bookmarked")
 @Composable
 fun ArticleComponentNotBookmarkedPreview() {
-    val sampleArticle = Article(
-        source = au.com.pbizannes.headlines.domain.model.ArticleSource(id = "sample", name = "Sample News"),
+    val sampleArticleData = Article(
+        source = ArticleSource(id = "sample", name = "Sample News"),
         author = "Author Name",
         title = "Sample Article Title - Not Bookmarked",
         description = "This is a sample description for the article to see how it looks.",
         url = "https://example.com/sample",
         urlToImage = "https://via.placeholder.com/600x400.png?text=Article+Image",
-        publishedAt = "2023-01-02T14:00:00Z",
+        publishedAt = Instant.parse("2023-01-02T14:00:00Z"),
         content = "Sample content..."
     )
-    MaterialTheme { // Wrap in your app's theme for accurate preview
+    MaterialTheme {
         ArticleComponent(
-            article = sampleArticle,
-            isBookmarkedFlow = kotlinx.coroutines.flow.flowOf(false), // Simulate not bookmarked
+            article = sampleArticleData,
+            isBookmarkedFlow = kotlinx.coroutines.flow.flowOf(false),
             onArticleClick = {},
             onBookmarkToggle = { _, _ -> }
         )
@@ -151,19 +151,19 @@ fun ArticleComponentNotBookmarkedPreview() {
 @Preview(showBackground = true, name = "Article Item - Bookmarked")
 @Composable
 fun ArticleComponentBookmarkedPreview() {
-    val sampleArticle = Article(
-        source = au.com.pbizannes.headlines.domain.model.ArticleSource(id = "sample", name = "Sample News"),
+    val sampleArticleData = Article(
+        source = ArticleSource(id = "sample", name = "Sample News"),
         author = "Author Name",
         title = "Sample Article Title - Bookmarked and a bit longer",
         description = "This article is bookmarked. The description can be a bit longer to test text overflow and layout constraints properly.",
         url = "https://example.com/sample2",
         urlToImage = "https://via.placeholder.com/600x400.png?text=Bookmarked",
-        publishedAt = "2023-01-02T14:00:00Z",
+        publishedAt = Instant.parse("2023-01-02T14:00:00Z"),
         content = "Sample content..."
     )
     MaterialTheme {
         ArticleComponent(
-            article = sampleArticle,
+            article = sampleArticleData,
             isBookmarkedFlow = kotlinx.coroutines.flow.flowOf(true), // Simulate bookmarked
             onArticleClick = {},
             onBookmarkToggle = { _, _ -> }

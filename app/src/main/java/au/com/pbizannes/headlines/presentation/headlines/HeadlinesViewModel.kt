@@ -1,9 +1,12 @@
 package au.com.pbizannes.headlines.presentation.headlines
 
+import android.util.Log.e
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.pbizannes.headlines.domain.model.Article
-import au.com.pbizannes.headlines.domain.model.ArticleSource
+import au.com.pbizannes.headlines.data.models.ArticleData
+import au.com.pbizannes.headlines.data.models.ArticleSourceData
+import au.com.pbizannes.headlines.domain.models.Article
+import au.com.pbizannes.headlines.domain.models.ArticleSource
 import au.com.pbizannes.headlines.domain.repository.ArticleRepository
 import au.com.pbizannes.headlines.domain.repository.NewsRepository
 import au.com.pbizannes.headlines.domain.repository.UserPreferencesRepository
@@ -27,31 +30,19 @@ class HeadlinesViewModel @Inject constructor(
     private val _headlinesUIState = MutableStateFlow<HeadlinesUIState>(HeadlinesUIState.Loading)
     val headlinesUIState: StateFlow<HeadlinesUIState> = _headlinesUIState.asStateFlow()
 
-    private val collectedArticles = MutableStateFlow<List<Article>>(emptyList())
-
-    // Function to check if an article is bookmarked/saved
-    // This will be called by each ArticleItem to determine initial checkbox state
     fun isArticleBookmarked(articleUrl: String): Flow<Boolean> {
         return articleRepository.isArticleSaved(articleUrl)
     }
 
-    // Function to handle checkbox state change
     fun onBookmarkCheckedChange(article: Article, isBookmarked: Boolean) {
         viewModelScope.launch {
             if (isBookmarked) {
                 articleRepository.saveArticle(article)
             } else {
-                // Ensure you have the full article details if deleting by object,
-                // or just use the URL if your repository supports deleteByUrl.
-                // Fetching the article again if only URL is available might be needed
-                // if deleteArticle requires the full object and it wasn't passed directly.
                 val existingArticle = articleRepository.getArticleByUrl(article.url)
                 existingArticle?.let {
                     articleRepository.deleteArticle(it)
                 }
-                // Or if your deleteArticle can handle a potentially partial Article object
-                // (e.g. if the primary key 'url' is enough for Room to find and delete)
-                // articleBookmarkRepository.deleteArticle(article)
             }
         }
     }
@@ -59,7 +50,6 @@ class HeadlinesViewModel @Inject constructor(
     fun loadContent() {
         viewModelScope.launch {
             _headlinesUIState.value = HeadlinesUIState.Loading
-            collectedArticles.value = emptyList() // Reset articles
 
             try {
                 userPreferencesRepository.selectedSourceIdsFlow().firstOrNull().let { selectedIds ->
@@ -70,25 +60,19 @@ class HeadlinesViewModel @Inject constructor(
                         )
                     } ?: listOf()
 
-                    newsRepository.getHeadlines(articleSources)
-                        .catch { e ->
-                            _headlinesUIState.value =
-                                HeadlinesUIState.Error("Error fetching headlines: ${e.message ?: "Unknown error"}")
+                    val result = newsRepository.getHeadlines(articleSources)
+                    when {
+                        result.isFailure -> {
+                            HeadlinesUIState.Error("Error fetching headlines: ${result.exceptionOrNull()?.message ?: "Unknown error"}")
                         }
-                        .collect { article ->
-                            val currentArticles = collectedArticles.value.toMutableList()
-                            currentArticles.add(article)
-                            collectedArticles.value = currentArticles
-                            _headlinesUIState.value =
-                                HeadlinesUIState.Success(collectedArticles.value)
+                        else -> {
+                            result.getOrNull()?.let { articles ->
+                                _headlinesUIState.value = HeadlinesUIState.Success(articles)
+                            }
                         }
-
-                    if (collectedArticles.value.isEmpty() && _headlinesUIState.value !is HeadlinesUIState.Error) {
-                        _headlinesUIState.value = HeadlinesUIState.Success(emptyList())
                     }
-
                 }
-            } catch (e: Exception) { // Catch any other exceptions during the process
+            } catch (e: Exception) {
                 _headlinesUIState.value =
                     HeadlinesUIState.Error("Failed to load headlines: ${e.message ?: "Unknown error"}")
             }
